@@ -1,0 +1,18 @@
+[package]
+name = "organtest"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rug = "1.11.0"
+rug-fft = "0.1.2"
+rand = "0.8.4"
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "mult"
+harness = false
