@@ -1,3 +1,14 @@
+use rug::Integer;
+
+#[derive(Debug, Clone)]
+pub struct CompParameters {
+    pub a: Vec<Integer>,
+    pub b: Vec<Integer>,
+    pub p: Integer,
+    pub w: Integer,
+    pub order: Integer
+}
+
 #[cfg(test)]
 mod tests {
     use rug::Integer;

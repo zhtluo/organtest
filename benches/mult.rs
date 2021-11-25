@@ -1,8 +1,13 @@
 use criterion::{criterion_group, criterion_main, Criterion};
+use organ::CompParameters;
 use rug::{rand::RandState, Integer};
 use rug_fft::{bit_rev_radix_2_intt, bit_rev_radix_2_ntt};
 use std::iter::repeat_with;
+use std::sync::mpsc;
+use std::sync::Arc;
+use std::thread;
 
+/*
 fn compute(
     a: &Vec<Integer>,
     b: &Vec<Integer>,
@@ -16,6 +21,35 @@ fn compute(
         c[i] = Integer::from(&c[i] * order) / p;
     }
     c
+}
+*/
+
+fn compute(param: Arc<CompParameters>) -> Vec<Integer> {
+    let mut c: Vec<Integer> = (0..param.a.len())
+        .map(|i| Integer::from(&param.a[i] * &param.b[i]))
+        .collect();
+    bit_rev_radix_2_intt(&mut c, &param.p, &param.w);
+    for i in 0..c.len() {
+        c[i] = Integer::from(&c[i] * &param.order) / &param.p;
+    }
+    c
+}
+
+fn multithread_compute(param: CompParameters) {
+    const NTHREADS: u32 = 100;
+    let mut children = vec![];
+    let (tx, rx) = mpsc::channel();
+    let param_arc = Arc::new(param);
+    for _ in 0..NTHREADS {
+        let txc = tx.clone();
+        let paramc = Arc::clone(&param_arc);
+        children.push(thread::spawn(move || {
+            txc.send(compute(paramc)).unwrap();
+        }));
+    }
+    for _ in 0..NTHREADS {
+        rx.recv().unwrap();
+    }
 }
 
 pub fn criterion_benchmark(c: &mut Criterion) {
@@ -60,7 +94,15 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     )
     .unwrap();
 
-    c.bench_function("compute", |b| b.iter(|| compute(&input1, &input2, &p, &w, &zq_order)));
+    let param = CompParameters {
+        a: input1,
+        b: input2,
+        p: p,
+        w: w,
+        order: zq_order,
+    };
+
+    c.bench_function("compute", |b| b.iter(|| multithread_compute(param.clone())));
 }
 
 criterion_group!(benches, criterion_benchmark);
