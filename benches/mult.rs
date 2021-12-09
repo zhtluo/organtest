@@ -128,8 +128,7 @@ pub fn criterion_benchmark_base(c: &mut Criterion) {
     /*
     BASE_PARAMS = {
         'P': 2 ** 32 - 5,
-        #'Q': 2 ** 56 - 5,
-        'Q': group112.order(),
+        'Q': 2 ** 56 - 5,
 
         'RING_V': (57 * (2 ** 96)) + 1,
         'VECTOR_LENGTH': 2048,
@@ -151,7 +150,7 @@ pub fn criterion_benchmark_base(c: &mut Criterion) {
         .collect();
     bit_rev_radix_2_ntt(&mut input1, &p, &w);
     bit_rev_radix_2_ntt(&mut input2, &p, &w);
-    let zq_order = Integer::from_str_radix("db7c2abf62e35e7628dfac6561c5", 16).unwrap();
+    let zq_order = Integer::from(Integer::u_pow_u(2, 56)) - 5;
 
     let param = CompParameters {
         a: input1,
