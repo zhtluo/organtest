@@ -139,7 +139,7 @@ pub fn criterion_benchmark_base(c: &mut Criterion) {
         */
 
     let len = 11; // 2^len = 2048
-    let p: Integer = Integer::from(Integer::u_pow_u(2, 32)) - 5; // 2 ** 32 - 5
+    let p: Integer = Integer::from(Integer::u_pow_u(2, 64)) - 59; // 2 ** 32 - 5
     let w = Integer::from(Integer::u_pow_u(2, 96)) * 57 + 1;
     let mut rand = RandState::new();
     let mut input1: Vec<Integer> = repeat_with(|| p.clone().random_below(&mut rand))
@@ -150,7 +150,7 @@ pub fn criterion_benchmark_base(c: &mut Criterion) {
         .collect();
     bit_rev_radix_2_ntt(&mut input1, &p, &w);
     bit_rev_radix_2_ntt(&mut input2, &p, &w);
-    let zq_order = Integer::from(Integer::u_pow_u(2, 56)) - 5;
+    let zq_order = Integer::from(Integer::u_pow_u(2, 84)) - 35;
 
     let param = CompParameters {
         a: input1,
